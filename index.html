@@ -310,6 +310,42 @@ a{
 
 </style>
 </head>
+<!-- Music Player -->
+<div id="musicControl" style="position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:50px;border:2px solid #00e676;cursor:pointer;z-index:999;">
+    <span style="font-size:20px;">⚽</span>
+    <button id="toggleMusic" style="background:none;border:none;color:#00e676;font-size:16px;cursor:pointer;">🔊</button>
+    <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" style="cursor:pointer;">
+</div>
+
+<audio id="bgMusic" loop autoplay>
+    <source src="onefootballmusic.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+const music = document.getElementById('bgMusic');
+const toggleBtn = document.getElementById('toggleMusic');
+const volumeSlider = document.getElementById('volumeControl');
+
+// Set initial volume
+music.volume = volumeSlider.value;
+
+// Toggle music
+toggleBtn.addEventListener('click', () => {
+    if (music.paused) {
+        music.play();
+        toggleBtn.textContent = '🔊';
+    } else {
+        music.pause();
+        toggleBtn.textContent = '🔇';
+    }
+});
+
+// Adjust volume
+volumeSlider.addEventListener('input', () => {
+    music.volume = volumeSlider.value;
+});
+</script>
 <body>
 <header class="site-header">
     <a href="https://x.com/ofc_the_club" target="_blank">
