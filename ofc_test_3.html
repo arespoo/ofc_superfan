@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Luckiest+Guy&display=swap" rel="stylesheet">
+
+<title>OneFootball Club Glory Wall</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+.team-title {
+    font-family: 'Luckiest Guy', cursive; /* Hoặc 'Bebas Neue' nếu muốn */
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #fff; /* Tùy chỉnh màu cho nổi bật */
+    text-shadow: 0 0 8px #00ffab; /* Tạo hiệu ứng neon xịn hơn */
+}
+
+
+:root{
+    --neon:#00e676;
+    --dark:#070707;
+}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:url('https://i.ibb.co/WT2ys64/hinh-nen-san-bong-dep-banner.jpg') center/cover no-repeat;
+    color:#fff;
+    text-align:center;
+}
+
+.site-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:16px 24px;
+    background:var(--dark);
+    border-bottom:4px solid var(--neon);
+}
+
+.header-logo{
+    width:52px;
+    height:52px;
+    border-radius:50%;
+    border:2px solid var(--neon);
+    object-fit:cover;
+}
+
+.header-title{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:32px;
+    text-transform:uppercase;
+    color:#fff;
+}
+
+.team-section{
+    max-width:1100px;
+    margin:30px auto;
+    padding:30px;
+    background:rgba(0,0,0,0.35);
+    border-radius:14px;
+}
+
+.team-title{
+    font-size:26px;
+    margin-bottom:20px;
+}
+
+.pitch{
+    position: relative;
+    margin: 0 auto;
+    width:820px;
+    max-width:95%;
+    height:600px;
+    border-radius:12px;
+    background:url('https://i.ibb.co/mVKFgsT5/Gemini-Generated-Image-e4c9iwe4c9iwe4c9.png') center/cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 20px 10px;
+}
+
+.row{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.row.top{
+    margin-top: 20px;
+}
+
+.row.bottom{
+    margin-top: 100px;
+}
+
+.player{
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    border:4px solid var(--neon);
+    background-size:cover;
+    background-position:center;
+    transition:.3s;
+    position: relative;
+}
+
+.player:hover{
+    transform: scale(1.15);
+    border-color:#00ffab;
+}
+
+.player .label{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.6);
+    padding:6px 8px;
+    border-radius:8px;
+    font-size:13px;
+    display:flex;
+    gap:4px;
+    flex-direction:column;
+    text-align:center;
+}
+
+.player .label a{
+    display:inline-block;
+    margin-top:4px;
+}
+
+.xicon{
+    width:16px;
+    height:16px;
+}
+
+.credits{
+    margin-top:30px;
+    font-size:12px;
+    opacity:.7;
+}
+
+a{
+    color:#00e676;
+    text-decoration:none;
+}
+
+/* Superfans Section */
+.superfans-section{
+    max-width:1100px;
+    margin:30px auto;
+    padding:20px;
+    background:rgba(0,0,0,0.35);
+    border-radius:14px;
+    overflow:hidden;
+    position: relative;
+    height:200px;
+}
+
+.superfans-container{
+    display: flex;
+    gap:30px;
+    position: absolute;
+    top:50%;
+    left:0%;
+    transform:translateY(-50%);
+    animation: scrollSuperfans 80s linear infinite;
+}
+
+.superfan{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+}
+
+.superfan .avatar{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background-size:cover;
+    background-position:center;
+    border:3px solid var(--neon);
+    transition: transform 0.3s;
+}
+
+.superfan .avatar:hover{
+    transform: scale(1.2);
+}
+
+.superfan .name{
+    font-size:16px;
+    color:#00e676;
+    white-space: nowrap;
+}
+
+.superfan .name a{
+    color:#00e676;
+    text-decoration:none;
+}
+
+@keyframes scrollSuperfans{
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+.howto-section{
+    max-width:1100px;
+    margin:40px auto;
+    padding:30px;
+    background:rgba(0,0,0,0.4);
+    border:2px solid var(--neon);
+    border-radius:14px;
+    text-align:left;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.howto-section .team-title{
+    font-size:26px;
+    margin-bottom:20px;
+    text-align:center;
+    color: #00ffab;
+    text-shadow: 0 0 8px #00ffab, 0 0 20px #00ffab;
+}
+
+.steps-container{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.step{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:12px 16px;
+    background:rgba(0,0,0,0.25);
+    border-radius:10px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.step:hover{
+    transform: scale(1.03);
+    box-shadow: 0 0 12px var(--neon);
+}
+
+.step-number{
+    font-size:20px;
+    flex-shrink:0;
+}
+
+.step-text{
+    font-size:16px;
+    line-height:1.4;
+}
+
+.step-text a{
+    color:#00e676;
+    text-decoration:none;
+}
+
+.countries{
+    margin-top:15px;
+    font-size:14px;
+    opacity:0.85;
+    text-align:center;
+}
+
+/* Glow animation */
+@keyframes glow{
+    0% { box-shadow: 0 0 8px var(--neon); }
+    100% { box-shadow: 0 0 18px #00ffab; }
+}
+
+.superfan-title {
+    margin: 20px 0 10px 0;
+}
+
+.superfan-title a {
+    color: #00ffab;
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow:
+        0 0 5px #00ffab,
+        0 0 10px #00ffab,
+        0 0 20px #00ffab,
+        0 0 40px #00ffab;
+    transition: all 0.3s ease-in-out;
+}
+
+.superfan-title a:hover {
+    text-shadow:
+        0 0 10px #00ffab,
+        0 0 20px #00ffab,
+        0 0 40px #00ffab,
+        0 0 60px #00ffab;
+    transform: scale(1.05);
+}
+
+.countdown {
+    font-size: 24px;
+    font-weight: bold;
+    color: #00e676;
+    text-shadow: 0 0 5px #00e676, 0 0 10px #00e676;
+    margin-bottom: 20px;
+}
+
+
+</style>
+</head>
+<body>
+<header class="site-header">
+    <a href="https://x.com/ofc_the_club" target="_blank">
+        <img class="header-logo" src="https://pbs.twimg.com/profile_images/1805905043914121216/TMn0Dvx__400x400.png">
+    </a>
+    <div>
+        <div class="header-title">OneFootball Club Glory Wall</div>
+        <div style="font-size:12px;opacity:.65">Honoring our top superfans & contributors</div>
+    </div>
+</header>
+
+
+<section class="team-section">
+<div class="team-title">⚽ Meet The OFC Team</div>
+<div class="pitch">
+    <!-- Hàng trên (#1 #2 #3) -->
+    <div class="row top">
+        <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1947960043225198592/JWirQpr8_400x400.jpg');">
+            <div class="label" style="top:110%;">
+                <span class="name">Vince</span>
+                <span class="role">👑 Captain</span>
+                <a href="https://x.com/_viN040" target="_blank"><img src="https://pbs.twimg.com/profile_images/1955359038532653056/OSHY3ewP_400x400.jpg" class="xicon"/></a>
+            </div>
+        </div>
+        <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1961495044315111424/HlGo7ZRh_400x400.jpg');">
+            <div class="label" style="top:110%;">
+                <span class="name">Dnns</span>
+                <span class="role">👑 Captain</span>
+                <a href="https://x.com/dnns_eth" target="_blank"><img src="https://pbs.twimg.com/profile_images/1955359038532653056/OSHY3ewP_400x400.jpg" class="xicon"/></a>
+            </div>
+        </div>
+        <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1958354067182309376/hHXa2s_Y_400x400.jpg');">
+            <div class="label" style="top:110%;">
+                <span class="name">Chokmah</span>
+                <span class="role">📣 Community Cheerleader</span>
+                <a href="https://x.com/chokmahxbt" target="_blank"><img src="https://pbs.twimg.com/profile_images/1955359038532653056/OSHY3ewP_400x400.jpg" class="xicon"/></a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hàng dưới (#4 #5 #6) -->
+    <div class="row bottom">
+        <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1948259692318441472/iD2K_Jya_400x400.jpg'); transform: translateY(30%);">
+            <div class="label" style="top:120%;">
+                <span class="name">Djtsoi</span>
+                <span class="role">🧭 Token Advisory</span>
+                <a href="https://x.com/djtsoi" target="_blank"><img src="https://pbs.twimg.com/profile_images/1955359038532653056/OSHY3ewP_400x400.jpg" class="xicon"/></a>
+            </div>
+        </div>
+        <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1947949352808226816/dmmgSpyO_400x400.jpg'); transform: translateY(30%);">
+            <div class="label" style="top:120%;">
+                <span class="name">Alexander Broegger</span>
+                <span class="role">📊 Tokenomics Strategy</span>
+                <a href="https://x.com/alexandery_b" target="_blank"><img src="https://pbs.twimg.com/profile_images/1955359038532653056/OSHY3ewP_400x400.jpg" class="xicon"/></a>
+            </div>
+        </div>
+        <div class="player" style="background-image:url('https://i.ibb.co/Wr0nTK5/G7g5r1-Bb-IAA-y-Xz-format-jpg-name-4096x4096.jpg'); transform: translateY(30%);">
+            <div class="label" style="top:120%;">
+                <span class="name">Coming Soon</span>
+                <span class="role">⏳ TBD</span>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+<!-- Superfans Section -->
+<section class="superfans-section">
+    <div class="team-title">🎉 OFC Super Fans</div>
+    <div class="superfans-container">
+        <!-- Demo 23 Superfans, bạn chỉ việc thay avatar, tên và link -->
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1975715898918096896/w9WnNauz_400x400.jpg');"></div><div class="name"><a href="https://x.com/Tony_0xy" target="_blank">Tony_0xy</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1957818597247774720/EO131_S4_400x400.jpg');"></div><div class="name"><a href="https://x.com/divzkie1206" target="_blank">Divzkie</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1970176685413740544/RUJ5aXj9_400x400.jpg');"></div><div class="name"><a href="https://x.com/defihabibii" target="_blank">Defihabibii</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1948322334999457792/pOyY7Kl-_400x400.jpg');"></div><div class="name"><a href="https://x.com/geraldzoleta1" target="_blank">Geraldzoleta</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1976634474785132544/UH5SVZbd_400x400.jpg');"></div><div class="name"><a href="https://x.com/Mdfaruk197" target="_blank">MD FARUK</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1968333340441825280/DcxEGy6T_400x400.jpg');"></div><div class="name"><a href="https://x.com/peegee777135" target="_blank">Peegee</a></div></div>
+        <!-- Lặp lại cho đủ 23 -->
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1965035600588787712/hgLHe5xv_400x400.jpg');"></div><div class="name"><a href="https://x.com/bala_balami" target="_blank">Bala_balami</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1984465018466025475/BSdXV7XU_400x400.jpg');"></div><div class="name"><a href="https://x.com/n0y0nahamed" target="_blank">Ur Noyon</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1983866573623279617/7PwtfjyE_400x400.jpg');"></div><div class="name"><a href="https://x.com/Emperor2303" target="_blank">EmperorX</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1995387798132568064/yFWATPTR_400x400.jpg');"></div><div class="name"><a href="https://x.com/Cryptoguru1023" target="_blank">Guru</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1961788141125160961/BNKN7qWc_400x400.jpg');"></div><div class="name"><a href="https://x.com/Bossman_horlar" target="_blank">HORLAR</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1971985956409589760/995R11Ft_400x400.jpg');"></div><div class="name"><a href="https://x.com/Huzky2003" target="_blank">Huzky</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1989700569318264834/RODE55Es_400x400.jpg');"></div><div class="name"><a href="https://x.com/WhaleEdgen" target="_blank">Mohdafham</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1982538673783455744/N6EfL7Dl_400x400.jpg');"></div><div class="name"><a href="https://x.com/Zubair_Labs" target="_blank">Zubair</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1954480494835294210/_2NX1aJj_400x400.jpg');"></div><div class="name"><a href="https://x.com/WasilatUmar2" target="_blank">Crypto_Gurl</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1957936541256323072/g_zceZvf_400x400.jpg');"></div><div class="name"><a href="https://x.com/Leumas_Agba" target="_blank">Sukuna</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1981001466752995328/R0L8KbdL_400x400.jpg');"></div><div class="name"><a href="https://x.com/JonnasOke" target="_blank">Jonnas</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1974207914140114944/GRnV5m56_400x400.jpg');"></div><div class="name"><a href="https://x.com/Introverted_Ad" target="_blank">Adil shah</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1988950483227275266/NC_VjaI5_400x400.jpg');"></div><div class="name"><a href="https://x.com/web3nara" target="_blank">Web3nara</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1978031436666941440/_griNjqx_400x400.jpg');"></div><div class="name"><a href="https://x.com/Vidix77" target="_blank">Vidix77</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1981699188078317568/x3kePbQn_400x400.jpg');"></div><div class="name"><a href="https://x.com/Mazz0001" target="_blank">Mazz</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1961814856912236544/_TdOYlK0_400x400.jpg');"></div><div class="name"><a href="https://x.com/EugeneOdi2026" target="_blank">EugeneOdi2026</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://i.ibb.co/Wr0nTK5/G7g5r1-Bb-IAA-y-Xz-format-jpg-name-4096x4096.jpg');"></div><div class="name">Who Next?</div></div>
+        <!-- Demo 23 Superfans, bạn chỉ việc thay avatar, tên và link -->
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1975715898918096896/w9WnNauz_400x400.jpg');"></div><div class="name"><a href="https://x.com/Tony_0xy" target="_blank">Tony_0xy</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1957818597247774720/EO131_S4_400x400.jpg');"></div><div class="name"><a href="https://x.com/divzkie1206" target="_blank">Divzkie</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1970176685413740544/RUJ5aXj9_400x400.jpg');"></div><div class="name"><a href="https://x.com/defihabibii" target="_blank">Defihabibii</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1948322334999457792/pOyY7Kl-_400x400.jpg');"></div><div class="name"><a href="https://x.com/geraldzoleta1" target="_blank">Geraldzoleta</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1976634474785132544/UH5SVZbd_400x400.jpg');"></div><div class="name"><a href="https://x.com/Mdfaruk197" target="_blank">MD FARUK</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1968333340441825280/DcxEGy6T_400x400.jpg');"></div><div class="name"><a href="https://x.com/peegee777135" target="_blank">Peegee</a></div></div>
+        <!-- Lặp lại cho đủ 23 -->
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1965035600588787712/hgLHe5xv_400x400.jpg');"></div><div class="name"><a href="https://x.com/bala_balami" target="_blank">Bala_balami</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1984465018466025475/BSdXV7XU_400x400.jpg');"></div><div class="name"><a href="https://x.com/n0y0nahamed" target="_blank">Ur Noyon</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1983866573623279617/7PwtfjyE_400x400.jpg');"></div><div class="name"><a href="https://x.com/Emperor2303" target="_blank">EmperorX</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1995387798132568064/yFWATPTR_400x400.jpg');"></div><div class="name"><a href="https://x.com/Cryptoguru1023" target="_blank">Guru</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1961788141125160961/BNKN7qWc_400x400.jpg');"></div><div class="name"><a href="https://x.com/Bossman_horlar" target="_blank">HORLAR</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1971985956409589760/995R11Ft_400x400.jpg');"></div><div class="name"><a href="https://x.com/Huzky2003" target="_blank">Huzky</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1989700569318264834/RODE55Es_400x400.jpg');"></div><div class="name"><a href="https://x.com/WhaleEdgen" target="_blank">Mohdafham</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1982538673783455744/N6EfL7Dl_400x400.jpg');"></div><div class="name"><a href="https://x.com/Zubair_Labs" target="_blank">Zubair</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1954480494835294210/_2NX1aJj_400x400.jpg');"></div><div class="name"><a href="https://x.com/WasilatUmar2" target="_blank">Crypto_Gurl</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1957936541256323072/g_zceZvf_400x400.jpg');"></div><div class="name"><a href="https://x.com/Leumas_Agba" target="_blank">Sukuna</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1981001466752995328/R0L8KbdL_400x400.jpg');"></div><div class="name"><a href="https://x.com/JonnasOke" target="_blank">Jonnas</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1974207914140114944/GRnV5m56_400x400.jpg');"></div><div class="name"><a href="https://x.com/Introverted_Ad" target="_blank">Adil shah</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1988950483227275266/NC_VjaI5_400x400.jpg');"></div><div class="name"><a href="https://x.com/web3nara" target="_blank">Web3nara</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1978031436666941440/_griNjqx_400x400.jpg');"></div><div class="name"><a href="https://x.com/Vidix77" target="_blank">Vidix77</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1981699188078317568/x3kePbQn_400x400.jpg');"></div><div class="name"><a href="https://x.com/Mazz0001" target="_blank">Mazz</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1961814856912236544/_TdOYlK0_400x400.jpg');"></div><div class="name"><a href="https://x.com/EugeneOdi2026" target="_blank">EugeneOdi2026</a></div></div>
+        <div class="superfan"><div class="avatar" style="background-image:url('https://i.ibb.co/Wr0nTK5/G7g5r1-Bb-IAA-y-Xz-format-jpg-name-4096x4096.jpg');"></div><div class="name">Who Next?</div></div>
+        
+    </div>
+</section>
+<!-- How to Become a SuperFan Section -->
+<section class="howto-section">
+    <div class="superfan-title">
+    <a href="https://x.com/ofc_the_club/status/1997040927526055953" target="_blank">
+        🎁 How to Become an OFC SuperFan
+    </a>
+</div>
+
+<div class="countdown" id="superfanCountdown">
+    ⏳ Time left: <span id="days">0</span>d 
+    <span id="hours">0</span>h 
+    <span id="minutes">0</span>m 
+    <span id="seconds">0</span>s
+</div>
+    <div class="steps-container">
+        <div class="step">
+            <div class="step-number">1️⃣</div>
+            <div class="step-text">Start posting about OFC + Tag <a href="https://x.com/ofc_the_club" target="_blank">@ofc_the_club</a></div>
+        </div>
+        <div class="step">
+            <div class="step-number">2️⃣</div>
+            <div class="step-text">Stand out + Get selected as a SuperFan</div>
+        </div>
+        <div class="step">
+            <div class="step-number">3️⃣</div>
+            <div class="step-text">Get rewarded! 🎉 5,000 ⚽️ BALLS each</div>
+        </div>
+        <div class="step">
+            <div class="step-number">💡</div>
+            <div class="step-text">Be consistent and creative! E.g., post artworks, make huge OFC flags, host meetups</div>
+        </div>
+    </div>
+    <div class="countries">
+        Join OFC SuperFans from  Bangladesh,  󠁧England,  Germany,  Hongkong,  India,  Japan,  Nigeria,  Pakistan, the  Philippines and  Vietnam!
+    </div>
+</section>
+<div class="credits">Made with ❤️ - by <a href="https://x.com/CryptoxxHunter" target="_blank">KhoaTwT</a></div>
+<script>
+const countdown = document.getElementById('superfanCountdown');
+const daysEl = document.getElementById('days');
+const hoursEl = document.getElementById('hours');
+const minutesEl = document.getElementById('minutes');
+const secondsEl = document.getElementById('seconds');
+
+// Target time: 24/12/2025 23:59:59
+const targetDate = new Date("December 24, 2025 23:59:59").getTime();
+
+function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = targetDate - now;
+
+    if(diff <= 0){
+        countdown.innerHTML = "🎉 Event Ended!";
+        clearInterval(interval);
+        return;
+    }
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    daysEl.innerText = days;
+    hoursEl.innerText = hours;
+    minutesEl.innerText = minutes;
+    secondsEl.innerText = seconds;
+}
+
+const interval = setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
+
+</body>
+</html>
