@@ -312,8 +312,8 @@ a{
 </head>
 <!-- Music Player -->
 <div id="musicControl" style="position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:50px;border:2px solid #00e676;cursor:pointer;z-index:999;">
-    <span style="font-size:20px;">▶️</span>
-    <button id="toggleMusic" style="background:none;border:none;color:#00e676;font-size:16px;cursor:pointer;">🔊</button>
+    <span style="font-size:20px;">⚽️</span>
+    <button id="toggleMusic" style="background:none;border:none;color:#00e676;font-size:16px;cursor:pointer;">▶️</button>
     <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" style="cursor:pointer;">
 </div>
 
@@ -334,10 +334,10 @@ music.volume = volumeSlider.value;
 toggleBtn.addEventListener('click', () => {
     if (music.paused) {
         music.play();
-        toggleBtn.textContent = '🔊';
+        toggleBtn.textContent = '⏸';
     } else {
         music.pause();
-        toggleBtn.textContent = '🔇';
+        toggleBtn.textContent = '▶️';
     }
 });
 
@@ -551,5 +551,6 @@ updateCountdown();
 
 </body>
 </html>
+
 
 
