@@ -307,10 +307,84 @@ a{
     margin-bottom: 20px;
 }
 
+/* ===================== GAME CSS ===================== */
+  :root{--w:360px;--h:640px}
+  .game {
+    width:var(--w);height:var(--h);position:relative;border-radius:12px;overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+    background:#0b5a14 url('background.png') center/cover no-repeat;
+  }
 
+  /* HUD */
+  .hud {position:absolute;top:10px;left:12px;color:#fff;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,0.7);z-index:60}
+  .hud-right {position:absolute;top:10px;right:12px;color:#fff;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,0.7);z-index:60}
+
+  /* Goal (player) - ensure no translateX that breaks coords */
+  #goal {
+    position:relative;
+    width:130px;height:70px;image-rendering:optimizeQuality;display:block;
+    user-select:none;
+  }
+  #goalWrap {
+    position:absolute;bottom:10px;left:0; /* left will be controlled by JS */
+    width:150px;height:110px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none;z-index:50;
+  }
+
+  /* OFC falling item - make round */
+  .ofc {
+    position:absolute;width:48px;height:48px;top:-80px;
+    display:flex;align-items:center;justify-content:center;background:transparent;
+    user-select:none;box-shadow:0 10px 18px rgba(0,0,0,0.45);z-index:40;transform-origin:center center;
+    transition: transform 120ms ease;
+    border-radius:50%;
+    overflow:hidden;
+  }
+  /* Team Member (rare) visual enhancement - VIỀN NỔI BẬT */
+  .ofc[data-type="member"] {
+    border: 3px solid #00eaff; /* Viền màu Cyan 3px */
+    box-shadow: 0 0 12px 3px #00eaff, 0 10px 18px rgba(0,0,0,0.7); /* Hiệu ứng phát sáng Cyan */
+  }
+  .ofc img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* catch flash (+10) */
+  .point-fly {
+    position:absolute;font-weight:900;color:#ffd166;text-shadow:0 2px 8px rgba(0,0,0,0.6);z-index:80;
+    pointer-events:none;font-size:18px;
+    transform:translateY(0) scale(1);
+    opacity:1;
+    transition: transform 700ms cubic-bezier(.2,.9,.2,1), opacity 700ms linear;
+  }
+
+  /* particle */
+  .particle {
+    position:absolute;width:6px;height:6px;border-radius:50%;z-index:75;
+    opacity:1;pointer-events:none;
+    transition: transform 700ms cubic-bezier(.2,.9,.2,1), opacity 700ms linear;
+  }
+
+  /* Menu overlay */
+  #menu {position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35));gap:12px;color:#fff;z-index:70}
+  .menu-row {display:flex;gap:8px}
+  .game button {padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;background:#ffd166;color:#111}
+
+  /* Claim popup */
+  #claimPopup {
+    position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(0,0,0,0.75);flex-direction:column;color:#fff;text-align:center;padding:20px;gap:12px;z-index:90;
+  }
+  #claimPopup img{width:80px;height:80px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+
+  /* Small controls hint */
+  .hint {position:absolute;bottom:8px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.9);font-size:12px;z-index:60}
+
+  /* Mobile control area invisble but capture touch */
+  #touchPad {position:absolute;left:0;right:0;bottom:0;height:220px;pointer-events:auto;z-index:55}
+
+  /* Responsive */
+  @media (max-width:420px){ :root{--w:360px} }
+  /* ===================== END GAME CSS ===================== */
 </style>
 </head>
-<!-- Music Player -->
 <div id="musicControl" style="position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:50px;border:2px solid #00e676;cursor:pointer;z-index:999;">
     <span style="font-size:20px;">⚽️</span>
     <button id="toggleMusic" style="background:none;border:none;color:#00e676;font-size:16px;cursor:pointer;">▶️</button>
@@ -357,11 +431,45 @@ volumeSlider.addEventListener('input', () => {
     </div>
 </header>
 
+<section style="display:flex; justify-content:center; margin: 30px 0;">
+    <div class="game" id="game">
+      <div class="hud" id="ballsLabel">Balls: 0</div>
+      <div class="hud-right" id="lives">Lives: 3</div>
 
+      <div id="goalWrap">
+        <img id="goal" src="goal.png" alt="Goal">
+      </div>
+
+      <div id="items"></div>
+
+      <div id="menu">
+        <h2 style="margin:0">OFC Goal Catch</h2>
+        <div style="opacity:0.95">Catch the falling OFC logo — avoid missing it.</div>
+        <div class="menu-row">
+          <button id="startBtn">Start</button>
+          <button id="howBtn">How to play</button>
+          <button id="muteBtn">🔊 On</button>
+        </div>
+        <div style="font-size:12px;opacity:0.85">Move: ← → or Drag / Touch</div>
+      </div>
+
+      <div id="claimPopup">
+        <div id="claimText" style="font-size:18px;font-weight:800"></div>
+        <img src="ofc.png" alt="OFC logo">
+        <div style="display:flex;gap:8px">
+          <button id="claimBtn">Claim</button>
+          <button id="closeClaimBtn">Close</button>
+        </div>
+      </div>
+
+      <div class="hint">Use keyboard arrows or drag goal to move (Desktop / Mobile)</div>
+
+      <div id="touchPad"></div>
+    </div>
+</section>
 <section class="team-section">
 <div class="team-title">⚽ Meet The OFC Team</div>
 <div class="pitch">
-    <!-- Hàng trên (#1 #2 #3) -->
     <div class="row top">
         <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1947960043225198592/JWirQpr8_400x400.jpg');">
             <div class="label" style="top:110%;">
@@ -386,7 +494,6 @@ volumeSlider.addEventListener('input', () => {
         </div>
     </div>
 
-    <!-- Hàng dưới (#4 #5 #6) -->
     <div class="row bottom">
         <div class="player" style="background-image:url('https://pbs.twimg.com/profile_images/1948259692318441472/iD2K_Jya_400x400.jpg'); transform: translateY(30%);">
             <div class="label" style="top:120%;">
@@ -412,18 +519,15 @@ volumeSlider.addEventListener('input', () => {
 </div>
 </section>
 
-<!-- Superfans Section -->
 <section class="superfans-section">
     <div class="team-title">🎉 OFC Super Fans</div>
     <div class="superfans-container">
-        <!-- Demo 23 Superfans, bạn chỉ việc thay avatar, tên và link -->
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1975715898918096896/w9WnNauz_400x400.jpg');"></div><div class="name"><a href="https://x.com/Tony_0xy" target="_blank">Tony_0xy</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1957818597247774720/EO131_S4_400x400.jpg');"></div><div class="name"><a href="https://x.com/divzkie1206" target="_blank">Divzkie</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1970176685413740544/RUJ5aXj9_400x400.jpg');"></div><div class="name"><a href="https://x.com/defihabibii" target="_blank">Defihabibii</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1948322334999457792/pOyY7Kl-_400x400.jpg');"></div><div class="name"><a href="https://x.com/geraldzoleta1" target="_blank">Geraldzoleta</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1976634474785132544/UH5SVZbd_400x400.jpg');"></div><div class="name"><a href="https://x.com/Mdfaruk197" target="_blank">MD FARUK</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1968333340441825280/DcxEGy6T_400x400.jpg');"></div><div class="name"><a href="https://x.com/peegee777135" target="_blank">Peegee</a></div></div>
-        <!-- Lặp lại cho đủ 23 -->
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1965035600588787712/hgLHe5xv_400x400.jpg');"></div><div class="name"><a href="https://x.com/bala_balami" target="_blank">Bala_balami</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1984465018466025475/BSdXV7XU_400x400.jpg');"></div><div class="name"><a href="https://x.com/n0y0nahamed" target="_blank">Ur Noyon</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1983866573623279617/7PwtfjyE_400x400.jpg');"></div><div class="name"><a href="https://x.com/Emperor2303" target="_blank">EmperorX</a></div></div>
@@ -445,14 +549,12 @@ volumeSlider.addEventListener('input', () => {
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1980225824620982272/hsUNRbd3_400x400.jpg');"></div><div class="name"><a href="https://x.com/Stephenjerry001" target="_blank">Coingraph..O,G</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1995740406831874050/YanmPxO4_400x400.jpg');"></div><div class="name"><a href="https://x.com/AirdropwithSafu" target="_blank">𝗦𝗮𝗳𝗶𝗻 𝗢𝗳𝗳𝗶𝗰𝗶𝗮𝗹 𝗬𝗧</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://i.ibb.co/Wr0nTK5/G7g5r1-Bb-IAA-y-Xz-format-jpg-name-4096x4096.jpg');"></div><div class="name">Who Next?</div></div>
-        <!-- Demo 23 Superfans, bạn chỉ việc thay avatar, tên và link -->
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1975715898918096896/w9WnNauz_400x400.jpg');"></div><div class="name"><a href="https://x.com/Tony_0xy" target="_blank">Tony_0xy</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1957818597247774720/EO131_S4_400x400.jpg');"></div><div class="name"><a href="https://x.com/divzkie1206" target="_blank">Divzkie</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1970176685413740544/RUJ5aXj9_400x400.jpg');"></div><div class="name"><a href="https://x.com/defihabibii" target="_blank">Defihabibii</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1948322334999457792/pOyY7Kl-_400x400.jpg');"></div><div class="name"><a href="https://x.com/geraldzoleta1" target="_blank">Geraldzoleta</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1976634474785132544/UH5SVZbd_400x400.jpg');"></div><div class="name"><a href="https://x.com/Mdfaruk197" target="_blank">MD FARUK</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1968333340441825280/DcxEGy6T_400x400.jpg');"></div><div class="name"><a href="https://x.com/peegee777135" target="_blank">Peegee</a></div></div>
-        <!-- Lặp lại cho đủ 23 -->
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1965035600588787712/hgLHe5xv_400x400.jpg');"></div><div class="name"><a href="https://x.com/bala_balami" target="_blank">Bala_balami</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1984465018466025475/BSdXV7XU_400x400.jpg');"></div><div class="name"><a href="https://x.com/n0y0nahamed" target="_blank">Ur Noyon</a></div></div>
         <div class="superfan"><div class="avatar" style="background-image:url('https://pbs.twimg.com/profile_images/1983866573623279617/7PwtfjyE_400x400.jpg');"></div><div class="name"><a href="https://x.com/Emperor2303" target="_blank">EmperorX</a></div></div>
@@ -477,7 +579,6 @@ volumeSlider.addEventListener('input', () => {
         
     </div>
 </section>
-<!-- How to Become a SuperFan Section -->
 <section class="howto-section">
     <div class="superfan-title">
     <a href="https://x.com/ofc_the_club/status/1997040927526055953" target="_blank">
@@ -549,8 +650,470 @@ const interval = setInterval(updateCountdown, 1000);
 updateCountdown();
 </script>
 
+<script>
+/* --------------------------
+   Keep most original variable names
+---------------------------*/
+const game = document.getElementById('game');
+const goalWrap = document.getElementById('goalWrap');
+const goal = document.getElementById('goal');
+const items = document.getElementById('items');
+const ballsLabel = document.getElementById('ballsLabel');
+const livesEl = document.getElementById('lives');
+const menu = document.getElementById('menu');
+const startBtn = document.getElementById('startBtn');
+const muteBtn = document.getElementById('muteBtn');
+const claimPopup = document.getElementById('claimPopup');
+const claimText = document.getElementById('claimText');
+const claimBtn = document.getElementById('claimBtn');
+const closeClaimBtn = document.getElementById('closeClaimBtn');
+
+const GAME_W = 360, GAME_H = 640;
+
+/* Gameplay state */
+let balls = 0;
+let lives = 3;
+let running = false;
+let aimX = GAME_W/2;
+let itemsArr = [];
+
+/* Goal width read at start */
+let GOAL_WIDTH = 150; // initial fallback
+const GOAL_BOUND_PADDING = 6;
+
+/* Difficulty: time-based + per-score bump */
+const BASE_SPEED = 220;
+const BASE_SPAWN = 900;
+let fallSpeed = BASE_SPEED;
+let spawnInterval = BASE_SPAWN;
+const TIME_STEP = 10; // every 10s increase difficulty
+const TIME_SPEED_INC = 35; // TĂNG MẠNH TỐC ĐỘ THEO THỜI GIAN
+const TIME_SPAWN_DEC = 120; // TĂNG TỐC ĐỘ XUẤT HIỆN VẬT PHẨM
+const MIN_SPAWN = 280;
+
+/* per-score bump */
+const SCORE_STEP = 30;
+const SCORE_SPEED_INC = 10;
+
+/* Audio (mute flag) */
+let muted = false;
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+/* Helper: play short SFX (only if not muted) */
+function playCatchSound(){
+  if(muted) return;
+  const now = audioCtx.currentTime;
+  const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+  const freqs = [880,1100,1320];
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.linearRampToValueAtTime(0.14, now+0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.18);
+  freqs.forEach(f=>{
+    const o = audioCtx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = f;
+    o.connect(g);
+    o.start(now);
+    o.stop(now+0.16);
+  });
+}
+function playMissSound(){
+  if(muted) return;
+  const now = audioCtx.currentTime;
+  const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+  const o = audioCtx.createOscillator();
+  o.type = 'square';
+  o.frequency.value = 140;
+  o.connect(g);
+  g.gain.setValueAtTime(0.12, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.35);
+  o.start(now); o.stop(now+0.36);
+}
+
+
+/* Spawn function (round logos + rare members) */
+function spawnItem() {
+    const el = document.createElement('div');
+    el.className = 'ofc';
+    const img = document.createElement('img');
+
+    const x = Math.random() * (GAME_W - 48 - 16) + 8;
+    el.style.left = x + 'px';
+    el.style.top = '-80px';
+
+    // RANDOM RATE
+    const r = Math.random();
+
+    // MEMBER (rare) – tỉ lệ 1%
+    if (r < 0.05) {
+        const id = Math.floor(Math.random() * 5) + 1; // member1 → member5
+        img.src = `member${id}.jpg`;
+        img.alt = "Team Member";
+        img.style.borderRadius = "10px";
+
+        el.dataset.type = "member";
+        el.dataset.value = "1000";
+
+        el.appendChild(img);
+        items.appendChild(el);
+
+        itemsArr.push({
+            el,
+            x,
+            y: -80,
+            vy: fallSpeed + Math.random()*100, // Tăng giới hạn ngẫu nhiên
+            val: 1000,
+            rare: true
+        });
+        return;
+    }
+
+    // SUPERFAN (26 ảnh) – tỉ lệ 2%
+    if (r < 0.1) {    // 0.01 → member, 0.02 thêm → superfan
+        const id = Math.floor(Math.random() * 26) + 1; // superfan1.png → superfan26.png
+        img.src = `superfan${id}.jpg`;
+        img.alt = "Superfan";
+        img.style.borderRadius = "10px";
+
+        el.dataset.type = "superfan";
+        el.dataset.value = "500";
+
+        el.appendChild(img);
+        items.appendChild(el);
+
+        itemsArr.push({
+            el,
+            x,
+            y: -80,
+            vy: fallSpeed + Math.random()*90, // Tăng giới hạn ngẫu nhiên
+            val: 500,
+            superfan: true
+        });
+        return;
+    }
+
+    // NORMAL OFC (còn lại)
+    img.src = 'ofc.png';
+    img.alt = 'OFC';
+    img.style.borderRadius = '8px';
+
+    el.dataset.type = 'normal';
+    el.dataset.value = '10';
+
+    el.appendChild(img);
+    items.appendChild(el);
+
+    itemsArr.push({
+        el,
+        x,
+        y: -80,
+        vy: fallSpeed + Math.random()*80, // Tăng giới hạn ngẫu nhiên
+        val: 10
+    });
+}
+
+
+/* Point fly effect */
+function spawnPointFly(x,y,text){
+  const el = document.createElement('div');
+  el.className = 'point-fly';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.textContent = text;
+  document.getElementById('game').appendChild(el);
+  requestAnimationFrame(()=> {
+    el.style.transform = 'translateY(-60px) scale(1.2)';
+    el.style.opacity = '0';
+  });
+  setTimeout(()=> el.remove(), 800);
+}
+function popupText(x, y, text, color) {
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.position = 'absolute';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.color = color;
+    el.style.fontWeight = '900';
+    el.style.fontSize = '18px';
+    el.style.textShadow = '0 0 8px #000';
+    el.style.pointerEvents = 'none';
+    el.style.transition = 'all 0.6s ease-out';
+    el.style.opacity = '1';
+
+    game.appendChild(el);
+
+    setTimeout(() => {
+        el.style.transform = 'translateY(-40px)';
+        el.style.opacity = '0';
+    }, 20);
+
+    setTimeout(() => el.remove(), 700);
+}
+function spawnBurst(x, y, color) {
+    for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div');
+        p.style.position = 'absolute';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.width = '6px';
+        p.style.height = '6px';
+        p.style.borderRadius = '50%';
+        p.style.background = color;
+        p.style.opacity = '1';
+        p.style.pointerEvents = 'none';
+        p.style.transform = 'scale(1)';
+
+        game.appendChild(p);
+
+        const ang = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random()*30;
+        const tx = Math.cos(ang) * dist;
+        const ty = Math.sin(ang) * dist;
+
+        p.style.transition = 'all 0.5s ease-out';
+
+        requestAnimationFrame(() => {
+            p.style.transform = `translate(${tx}px, ${ty}px) scale(0.1)`;
+            p.style.opacity = '0';
+        });
+
+        setTimeout(() => p.remove(), 550);
+    }
+}
+
+/* Particles */
+function spawnParticles(cx, cy, color){
+  const count = 10;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (cx - 3) + 'px';
+    p.style.top = (cy - 3) + 'px';
+    p.style.background = color || '#ffd166';
+    document.getElementById('game').appendChild(p);
+    const angle = Math.random()*Math.PI*2;
+    const dist = 20 + Math.random()*60;
+    const tx = Math.cos(angle)*dist;
+    const ty = -Math.abs(Math.sin(angle))*(10 + Math.random()*60);
+    requestAnimationFrame(()=> {
+      p.style.transform = `translate(${tx}px, ${ty}px) scale(${0.6+Math.random()*0.8})`;
+      p.style.opacity = '0';
+    });
+    setTimeout(()=> p.remove(), 900);
+  }
+}
+
+/* Update HUD (Balls and Lives) */
+function updateHUD(){
+  ballsLabel.textContent = `Balls: ${balls}`;
+  livesEl.textContent = `Lives: ${lives}`;
+}
+
+/* Game loop with time-based difficulty + per-score bump */
+let lastTime = 0;
+let lastSpawn = 0;
+let gameStartTime = 0;
+function update(timestamp){
+  if(!running) return;
+  if(!lastTime) lastTime = timestamp;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  // time-based difficulty
+  const elapsedSec = (timestamp - gameStartTime) / 1000;
+  const steps = Math.floor(elapsedSec / TIME_STEP);
+  fallSpeed = BASE_SPEED + steps * TIME_SPEED_INC;
+  spawnInterval = Math.max(MIN_SPAWN, BASE_SPAWN - steps * TIME_SPAWN_DEC);
+
+  // spawn control
+  if(!lastSpawn) lastSpawn = timestamp;
+  if(timestamp - lastSpawn > spawnInterval){
+    spawnItem();
+    lastSpawn = timestamp;
+  }
+
+  // move goal toward aimX (aimX is center)
+  // ensure aimX is clamped to center range
+  const half = GOAL_WIDTH/2;
+  aimX = Math.max(half, Math.min(GAME_W - half, aimX));
+  const currentLeft = parseFloat(goalWrap.style.left || (GAME_W/2 - GOAL_WIDTH/2));
+  const targetLeft = aimX - GOAL_WIDTH/2;
+  const newLeft = currentLeft + (targetLeft - currentLeft) * Math.min(1, 12 * dt);
+  goalWrap.style.left = newLeft + 'px';
+
+  // update items
+  for(let i = itemsArr.length - 1; i >= 0; i--){
+    const it = itemsArr[i];
+    it.y += it.vy * dt;
+    it.el.style.top = it.y + 'px';
+
+    const goalTop = GAME_H - 110; // approximate
+    const goalLeft = parseFloat(goalWrap.style.left || 0);
+    const goalRight = goalLeft + GOAL_WIDTH;
+    const itemCenterX = it.x + 24;
+
+    // collision detection
+    if(it.y + 40 >= goalTop){
+      if(itemCenterX > goalLeft + 18 && itemCenterX < goalRight - 18){
+        // caught
+        playCatchSound();
+        it.el.style.transform = 'scale(1.25) rotate(-8deg)';
+        setTimeout(()=> { try{ it.el.remove() } catch(e){} }, 120);
+
+        // award value (normal or member)
+        balls += it.val;
+        updateHUD();
+
+        const catchX = it.x + 12;
+        const catchY = it.y;
+
+        if (it.el && it.el.dataset && it.el.dataset.type === 'member') {
+          // member caught: big reward
+          spawnPointFly(catchX, catchY, 'Team +1000 🎉');
+          spawnParticles(catchX+8, catchY+8, '#00eaff');
+          // special sound
+          try { 
+            const now = audioCtx.currentTime;
+            const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+            const o = audioCtx.createOscillator();
+            o.type = 'sine'; o.frequency.value = 880;
+            o.connect(g); o.start(now); o.stop(now+0.6);
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.linearRampToValueAtTime(0.2, now+0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, now+0.6);
+          } catch(e){}
+        } 
+        // --- START: Thêm xử lý cho Superfan ---
+        else if (it.el && it.el.dataset && it.el.dataset.type === 'superfan') {
+          // Superfan caught: medium reward
+          spawnPointFly(catchX, catchY, '+500'); // Chỉ hiện +500
+          popupText(catchX, catchY - 20, 'Superfan', '#00f7c2'); // Thêm chữ "Superfan" bay lên
+          spawnBurst(catchX+18, catchY+18, '#ff8000'); // Hiệu ứng nổ màu cam
+          spawnParticles(catchX+8, catchY+8, '#ff8000'); // Hạt bụi màu cam
+        }
+        // --- END: Thêm xử lý cho Superfan ---
+        else {
+          spawnPointFly(catchX, catchY, '+10');
+          spawnParticles(catchX+8, catchY+8, '#ffd166');
+        }
+
+        itemsArr.splice(i,1);
+
+        // per-score bump: every SCORE_STEP balls (balls are multiples of 10)
+        if(balls % (SCORE_STEP) === 0){
+          fallSpeed += SCORE_SPEED_INC;
+        }
+
+        continue;
+      }
+    }
+    
+
+
+    // missed (fell off bottom)
+    if(it.y > GAME_H + 30){
+      playMissSound();
+      itemsArr.splice(i,1);
+      try{ it.el.remove() } catch(e){}
+      lives -= 1;
+      updateHUD();
+      if(lives <= 0){
+        // show claim popup
+        endGame();
+        return;
+      }
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+/* Start game */
+function startGame(){
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  // reset
+  balls = 0; lives = 3;
+  fallSpeed = BASE_SPEED; spawnInterval = BASE_SPAWN;
+  itemsArr.forEach(it=>{ try{ it.el.remove() } catch(e){} });
+  itemsArr = [];
+  updateHUD();
+  menu.style.display = 'none';
+  claimPopup.style.display = 'none';
+
+  // compute GOAL_WIDTH from CSS to be exact
+  GOAL_WIDTH = parseFloat(getComputedStyle(goalWrap).width);
+
+  // position goal centered
+  goalWrap.style.left = (GAME_W/2 - GOAL_WIDTH/2) + 'px';
+  aimX = GAME_W/2;
+
+  lastTime = 0;
+  lastSpawn = 0;
+  gameStartTime = performance.now();
+  running = true;
+  requestAnimationFrame(update);
+}
+
+/* End game -> show claim popup */
+function endGame(){
+  running = false;
+  // compute reward
+  const reward = Math.floor(balls / 10);
+  claimText.innerHTML = `You are eligible to claim <br><b>${reward} $OFC</b>`;
+  claimPopup.style.display = 'flex';
+}
+
+/* Claim behaviour: show Just for fun then back to start */
+claimBtn.addEventListener('click', ()=>{
+  claimText.innerHTML = 'Just for fun 🤣';
+  setTimeout(()=>{
+    claimPopup.style.display = 'none';
+    menu.style.display = 'flex';
+  }, 1200);
+});
+closeClaimBtn.addEventListener('click', ()=>{
+  claimPopup.style.display = 'none';
+  menu.style.display = 'flex';
+});
+
+/* Controls - mouse / touch / keyboard */
+const touchPad = document.getElementById('touchPad');
+
+game.addEventListener('mousemove', e=>{
+  const rect = game.getBoundingClientRect();
+  aimX = e.clientX - rect.left;
+});
+touchPad.addEventListener('touchmove', e=>{
+  const rect = game.getBoundingClientRect();
+  aimX = e.touches[0].clientX - rect.left;
+});
+document.addEventListener('keydown', e=>{
+  if(e.key === 'ArrowLeft') aimX -= 12;
+  if(e.key === 'ArrowRight') aimX += 12;
+});
+
+/* Mute toggle */
+muteBtn.addEventListener('click', ()=>{
+  muted = !muted;
+  muteBtn.textContent = muted ? '🔇 Off' : '🔊 On';
+});
+
+/* How to play */
+document.getElementById('howBtn').addEventListener('click', ()=>{
+  alert('Use ← → keys or drag on mobile to move the goal left/right. Catch falling OFC logos. You have 3 lives. After game over you can claim reward based on Balls/10 (Just for fun).');
+});
+
+/* Start button */
+startBtn.addEventListener('click', startGame);
+
+/* Initialize layout */
+(function init(){
+  // ensure goalWrap left is set so movement uses correct numeric left
+  GOAL_WIDTH = parseFloat(getComputedStyle(goalWrap).width);
+  goalWrap.style.left = (GAME_W/2 - GOAL_WIDTH/2) + 'px';
+  updateHUD();
+})();
+</script>
 </body>
 </html>
-
-
-
