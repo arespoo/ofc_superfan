@@ -1,11 +1,656 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <title>OFC Games</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>OFC Goal Catch — Final</title>
+<style>
+  /* ===================== RESET & BODY CENTERING ===================== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0a4d12 0%, #1a1a2e 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+  }
+  
+  /* Container wrapper */
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  /* Home button */
+  .home-btn {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #00e676 0%, #00c853 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .home-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.6);
+  }
+  
+  .home-btn:active {
+    transform: translateY(0);
+  }
+
+  /* ===================== GAME CSS ===================== */
+  :root{--w:360px;--h:640px}
+  .game {
+    width:var(--w);height:var(--h);position:relative;border-radius:12px;overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,0.6);
+    background:#0b5a14 url('background.png') center/cover no-repeat;
+  }
+
+  /* HUD */
+  .hud {position:absolute;top:10px;left:12px;color:#fff;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,0.7);z-index:60}
+  .hud-right {position:absolute;top:10px;right:12px;color:#fff;font-weight:800;text-shadow:0 1px 3px rgba(0,0,0,0.7);z-index:60}
+
+  /* Goal (player) - ensure no translateX that breaks coords */
+  #goal {
+    position:relative;
+    width:130px;height:70px;image-rendering:optimizeQuality;display:block;
+    user-select:none;
+  }
+  #goalWrap {
+    position:absolute;bottom:10px;left:0;
+    width:150px;height:110px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none;z-index:50;
+  }
+
+  /* OFC falling item - make round */
+  .ofc {
+    position:absolute;width:48px;height:48px;top:-80px;
+    display:flex;align-items:center;justify-content:center;background:transparent;
+    user-select:none;box-shadow:0 10px 18px rgba(0,0,0,0.45);z-index:40;transform-origin:center center;
+    transition: transform 120ms ease;
+    border-radius:50%;
+    overflow:hidden;
+  }
+  .ofc[data-type="member"] {
+    border: 3px solid #00eaff;
+    box-shadow: 0 0 12px 3px #00eaff, 0 10px 18px rgba(0,0,0,0.7);
+  }
+  .ofc img{width:100%;height:100%;object-fit:cover;display:block}
+
+  /* catch flash (+10) */
+  .point-fly {
+    position:absolute;font-weight:900;color:#ffd166;text-shadow:0 2px 8px rgba(0,0,0,0.6);z-index:80;
+    pointer-events:none;font-size:18px;
+    transform:translateY(0) scale(1);
+    opacity:1;
+    transition: transform 700ms cubic-bezier(.2,.9,.2,1), opacity 700ms linear;
+  }
+
+  /* particle */
+  .particle {
+    position:absolute;width:6px;height:6px;border-radius:50%;z-index:75;
+    opacity:1;pointer-events:none;
+    transition: transform 700ms cubic-bezier(.2,.9,.2,1), opacity 700ms linear;
+  }
+
+  /* Menu overlay */
+  #menu {position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.35));gap:12px;color:#fff;z-index:70}
+  .menu-row {display:flex;gap:8px}
+  .game button {padding:10px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:700;background:#ffd166;color:#111}
+
+  /* Claim popup */
+  #claimPopup {
+    position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(0,0,0,0.75);flex-direction:column;color:#fff;text-align:center;padding:20px;gap:12px;z-index:90;
+  }
+  #claimPopup img{width:80px;height:80px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+
+  /* Small controls hint */
+  .hint {position:absolute;bottom:8px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.9);font-size:12px;z-index:60}
+
+  /* Mobile control area invisble but capture touch */
+  #touchPad {position:absolute;left:0;right:0;bottom:0;height:220px;pointer-events:auto;z-index:55}
+
+  /* Music control */
+  #musicControl {
+    position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;
+    background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:50px;border:2px solid #00e676;
+    cursor:pointer;z-index:999;
+  }
+  
+  #toggleMusic {
+    background:none;border:none;color:#00e676;font-size:16px;cursor:pointer;
+  }
+
+  /* Responsive */
+  @media (max-width:420px){ 
+    :root{--w:340px}
+    body {
+      padding: 10px;
+    }
+    .home-btn {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+  }
+</style>
 </head>
 <body>
-  <h1>🎮 OFC Games</h1>
-  <a href="/">⬅ Back Home</a>
+
+<div class="game-container">
+  <!-- Home button -->
+  <button class="home-btn" onclick="window.location.href='index.html'">
+    <span>🏠</span>
+    <span>Home</span>
+  </button>
+  
+  <!-- Game -->
+  <div class="game" id="game">
+    <div class="hud" id="ballsLabel">Balls: 0</div>
+    <div class="hud-right" id="lives">Lives: 3</div>
+
+    <div id="goalWrap">
+      <img id="goal" src="goal.png" alt="Goal">
+    </div>
+
+    <div id="items"></div>
+
+    <div id="menu">
+      <h2 style="margin:0">OFC Goal Catch</h2>
+      <div style="opacity:0.95">Catch the falling OFC logo — avoid missing it.</div>
+      <div class="menu-row">
+        <button id="startBtn">Start</button>
+        <button id="howBtn">How to play</button>
+        <button id="muteBtn">🔊 On</button>
+      </div>
+      <div style="font-size:12px;opacity:0.85">Move: ← → or Drag / Touch</div>
+    </div>
+
+    <div id="claimPopup">
+      <div id="claimText" style="font-size:18px;font-weight:800"></div>
+      <img src="ofc.png" alt="OFC logo">
+      <div style="display:flex;gap:8px">
+        <button id="claimBtn">Claim</button>
+        <button id="closeClaimBtn">Close</button>
+      </div>
+    </div>
+
+    <div class="hint">Use keyboard arrows or drag goal to move (Desktop / Mobile)</div>
+
+    <div id="touchPad"></div>
+  </div>
+</div>
+
+<!-- Music control -->
+<div id="musicControl">
+  <span style="font-size:20px;">⚽️</span>
+  <button id="toggleMusic">▶️</button>
+  <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="0.5" style="cursor:pointer;">
+</div>
+
+<audio id="bgMusic" loop autoplay>
+  <source src="onefootballmusic.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const music = document.getElementById('bgMusic');
+const toggleBtn = document.getElementById('toggleMusic');
+const volumeSlider = document.getElementById('volumeControl');
+
+music.volume = volumeSlider.value;
+
+toggleBtn.addEventListener('click', () => {
+    if (music.paused) {
+        music.play();
+        toggleBtn.textContent = '⏸';
+    } else {
+        music.pause();
+        toggleBtn.textContent = '▶️';
+    }
+});
+
+volumeSlider.addEventListener('input', () => {
+    music.volume = volumeSlider.value;
+});
+
+/* Game code */
+const game = document.getElementById('game');
+const goalWrap = document.getElementById('goalWrap');
+const goal = document.getElementById('goal');
+const items = document.getElementById('items');
+const ballsLabel = document.getElementById('ballsLabel');
+const livesEl = document.getElementById('lives');
+const menu = document.getElementById('menu');
+const startBtn = document.getElementById('startBtn');
+const muteBtn = document.getElementById('muteBtn');
+const claimPopup = document.getElementById('claimPopup');
+const claimText = document.getElementById('claimText');
+const claimBtn = document.getElementById('claimBtn');
+const closeClaimBtn = document.getElementById('closeClaimBtn');
+
+const GAME_W = 360, GAME_H = 640;
+
+let balls = 0;
+let lives = 3;
+let running = false;
+let aimX = GAME_W/2;
+let itemsArr = [];
+
+let GOAL_WIDTH = 150;
+const GOAL_BOUND_PADDING = 6;
+
+const BASE_SPEED = 220;
+const BASE_SPAWN = 900;
+let fallSpeed = BASE_SPEED;
+let spawnInterval = BASE_SPAWN;
+const TIME_STEP = 10;
+const TIME_SPEED_INC = 35;
+const TIME_SPAWN_DEC = 120;
+const MIN_SPAWN = 280;
+
+const SCORE_STEP = 30;
+const SCORE_SPEED_INC = 10;
+
+let muted = false;
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playCatchSound(){
+  if(muted) return;
+  const now = audioCtx.currentTime;
+  const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+  const freqs = [880,1100,1320];
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.linearRampToValueAtTime(0.14, now+0.01);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.18);
+  freqs.forEach(f=>{
+    const o = audioCtx.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = f;
+    o.connect(g);
+    o.start(now);
+    o.stop(now+0.16);
+  });
+}
+
+function playMissSound(){
+  if(muted) return;
+  const now = audioCtx.currentTime;
+  const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+  const o = audioCtx.createOscillator();
+  o.type = 'square';
+  o.frequency.value = 140;
+  o.connect(g);
+  g.gain.setValueAtTime(0.12, now);
+  g.gain.exponentialRampToValueAtTime(0.001, now+0.35);
+  o.start(now); o.stop(now+0.36);
+}
+
+function spawnItem() {
+    const el = document.createElement('div');
+    el.className = 'ofc';
+    const img = document.createElement('img');
+
+    const x = Math.random() * (GAME_W - 48 - 16) + 8;
+    el.style.left = x + 'px';
+    el.style.top = '-80px';
+
+    const r = Math.random();
+
+    if (r < 0.05) {
+        const id = Math.floor(Math.random() * 5) + 1;
+        img.src = `member${id}.jpg`;
+        img.alt = "Team Member";
+        img.style.borderRadius = "10px";
+
+        el.dataset.type = "member";
+        el.dataset.value = "1000";
+
+        el.appendChild(img);
+        items.appendChild(el);
+
+        itemsArr.push({
+            el,
+            x,
+            y: -80,
+            vy: fallSpeed + Math.random()*100,
+            val: 1000,
+            rare: true
+        });
+        return;
+    }
+
+    if (r < 0.1) {
+        const id = Math.floor(Math.random() * 26) + 1;
+        img.src = `superfan${id}.jpg`;
+        img.alt = "Superfan";
+        img.style.borderRadius = "10px";
+
+        el.dataset.type = "superfan";
+        el.dataset.value = "500";
+
+        el.appendChild(img);
+        items.appendChild(el);
+
+        itemsArr.push({
+            el,
+            x,
+            y: -80,
+            vy: fallSpeed + Math.random()*90,
+            val: 500,
+            superfan: true
+        });
+        return;
+    }
+
+    img.src = 'ofc.png';
+    img.alt = 'OFC';
+    img.style.borderRadius = '8px';
+
+    el.dataset.type = 'normal';
+    el.dataset.value = '10';
+
+    el.appendChild(img);
+    items.appendChild(el);
+
+    itemsArr.push({
+        el,
+        x,
+        y: -80,
+        vy: fallSpeed + Math.random()*80,
+        val: 10
+    });
+}
+
+function spawnPointFly(x,y,text){
+  const el = document.createElement('div');
+  el.className = 'point-fly';
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+  el.textContent = text;
+  document.getElementById('game').appendChild(el);
+  requestAnimationFrame(()=> {
+    el.style.transform = 'translateY(-60px) scale(1.2)';
+    el.style.opacity = '0';
+  });
+  setTimeout(()=> el.remove(), 800);
+}
+
+function popupText(x, y, text, color) {
+    const el = document.createElement('div');
+    el.textContent = text;
+    el.style.position = 'absolute';
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.color = color;
+    el.style.fontWeight = '900';
+    el.style.fontSize = '18px';
+    el.style.textShadow = '0 0 8px #000';
+    el.style.pointerEvents = 'none';
+    el.style.transition = 'all 0.6s ease-out';
+    el.style.opacity = '1';
+
+    game.appendChild(el);
+
+    setTimeout(() => {
+        el.style.transform = 'translateY(-40px)';
+        el.style.opacity = '0';
+    }, 20);
+
+    setTimeout(() => el.remove(), 700);
+}
+
+function spawnBurst(x, y, color) {
+    for (let i = 0; i < 14; i++) {
+        const p = document.createElement('div');
+        p.style.position = 'absolute';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        p.style.width = '6px';
+        p.style.height = '6px';
+        p.style.borderRadius = '50%';
+        p.style.background = color;
+        p.style.opacity = '1';
+        p.style.pointerEvents = 'none';
+        p.style.transform = 'scale(1)';
+
+        game.appendChild(p);
+
+        const ang = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random()*30;
+        const tx = Math.cos(ang) * dist;
+        const ty = Math.sin(ang) * dist;
+
+        p.style.transition = 'all 0.5s ease-out';
+
+        requestAnimationFrame(() => {
+            p.style.transform = `translate(${tx}px, ${ty}px) scale(0.1)`;
+            p.style.opacity = '0';
+        });
+
+        setTimeout(() => p.remove(), 550);
+    }
+}
+
+function spawnParticles(cx, cy, color){
+  const count = 10;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = (cx - 3) + 'px';
+    p.style.top = (cy - 3) + 'px';
+    p.style.background = color || '#ffd166';
+    document.getElementById('game').appendChild(p);
+    const angle = Math.random()*Math.PI*2;
+    const dist = 20 + Math.random()*60;
+    const tx = Math.cos(angle)*dist;
+    const ty = -Math.abs(Math.sin(angle))*(10 + Math.random()*60);
+    requestAnimationFrame(()=> {
+      p.style.transform = `translate(${tx}px, ${ty}px) scale(${0.6+Math.random()*0.8})`;
+      p.style.opacity = '0';
+    });
+    setTimeout(()=> p.remove(), 900);
+  }
+}
+
+function updateHUD(){
+  ballsLabel.textContent = `Balls: ${balls}`;
+  livesEl.textContent = `Lives: ${lives}`;
+}
+
+let lastTime = 0;
+let lastSpawn = 0;
+let gameStartTime = 0;
+
+function update(timestamp){
+  if(!running) return;
+  if(!lastTime) lastTime = timestamp;
+  const dt = (timestamp - lastTime) / 1000;
+  lastTime = timestamp;
+
+  const elapsedSec = (timestamp - gameStartTime) / 1000;
+  const steps = Math.floor(elapsedSec / TIME_STEP);
+  fallSpeed = BASE_SPEED + steps * TIME_SPEED_INC;
+  spawnInterval = Math.max(MIN_SPAWN, BASE_SPAWN - steps * TIME_SPAWN_DEC);
+
+  if(!lastSpawn) lastSpawn = timestamp;
+  if(timestamp - lastSpawn > spawnInterval){
+    spawnItem();
+    lastSpawn = timestamp;
+  }
+
+  const half = GOAL_WIDTH/2;
+  aimX = Math.max(half, Math.min(GAME_W - half, aimX));
+  const currentLeft = parseFloat(goalWrap.style.left || (GAME_W/2 - GOAL_WIDTH/2));
+  const targetLeft = aimX - GOAL_WIDTH/2;
+  const newLeft = currentLeft + (targetLeft - currentLeft) * Math.min(1, 12 * dt);
+  goalWrap.style.left = newLeft + 'px';
+
+  for(let i = itemsArr.length - 1; i >= 0; i--){
+    const it = itemsArr[i];
+    it.y += it.vy * dt;
+    it.el.style.top = it.y + 'px';
+
+    const goalTop = GAME_H - 110;
+    const goalLeft = parseFloat(goalWrap.style.left || 0);
+    const goalRight = goalLeft + GOAL_WIDTH;
+    const itemCenterX = it.x + 24;
+
+    if(it.y + 40 >= goalTop){
+      if(itemCenterX > goalLeft + 18 && itemCenterX < goalRight - 18){
+        playCatchSound();
+        it.el.style.transform = 'scale(1.25) rotate(-8deg)';
+        setTimeout(()=> { try{ it.el.remove() } catch(e){} }, 120);
+
+        balls += it.val;
+        updateHUD();
+
+        const catchX = it.x + 12;
+        const catchY = it.y;
+
+        if (it.el && it.el.dataset && it.el.dataset.type === 'member') {
+          spawnPointFly(catchX, catchY, 'Team +1000 🎉');
+          spawnParticles(catchX+8, catchY+8, '#00eaff');
+          try { 
+            const now = audioCtx.currentTime;
+            const g = audioCtx.createGain(); g.connect(audioCtx.destination);
+            const o = audioCtx.createOscillator();
+            o.type = 'sine'; o.frequency.value = 880;
+            o.connect(g); o.start(now); o.stop(now+0.6);
+            g.gain.setValueAtTime(0.0001, now);
+            g.gain.linearRampToValueAtTime(0.2, now+0.02);
+            g.gain.exponentialRampToValueAtTime(0.0001, now+0.6);
+          } catch(e){}
+        } 
+        else if (it.el && it.el.dataset && it.el.dataset.type === 'superfan') {
+          spawnPointFly(catchX, catchY, '+500');
+          popupText(catchX, catchY - 20, 'Superfan', '#00f7c2');
+          spawnBurst(catchX+18, catchY+18, '#ff8000');
+          spawnParticles(catchX+8, catchY+8, '#ff8000');
+        }
+        else {
+          spawnPointFly(catchX, catchY, '+10');
+          spawnParticles(catchX+8, catchY+8, '#ffd166');
+        }
+
+        itemsArr.splice(i,1);
+
+        if(balls % (SCORE_STEP) === 0){
+          fallSpeed += SCORE_SPEED_INC;
+        }
+
+        continue;
+      }
+    }
+
+    if(it.y > GAME_H + 30){
+      playMissSound();
+      itemsArr.splice(i,1);
+      try{ it.el.remove() } catch(e){}
+      lives -= 1;
+      updateHUD();
+      if(lives <= 0){
+        endGame();
+        return;
+      }
+    }
+  }
+
+  requestAnimationFrame(update);
+}
+
+function startGame(){
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  balls = 0; lives = 3;
+  fallSpeed = BASE_SPEED; spawnInterval = BASE_SPAWN;
+  itemsArr.forEach(it=>{ try{ it.el.remove() } catch(e){} });
+  itemsArr = [];
+  updateHUD();
+  menu.style.display = 'none';
+  claimPopup.style.display = 'none';
+
+  GOAL_WIDTH = parseFloat(getComputedStyle(goalWrap).width);
+
+  goalWrap.style.left = (GAME_W/2 - GOAL_WIDTH/2) + 'px';
+  aimX = GAME_W/2;
+
+  lastTime = 0;
+  lastSpawn = 0;
+  gameStartTime = performance.now();
+  running = true;
+  requestAnimationFrame(update);
+}
+
+function endGame(){
+  running = false;
+  const reward = Math.floor(balls / 10);
+  claimText.innerHTML = `You are eligible to claim <br><b>${reward} $OFC</b>`;
+  claimPopup.style.display = 'flex';
+}
+
+claimBtn.addEventListener('click', ()=>{
+  claimText.innerHTML = 'Just for fun 🤣';
+  setTimeout(()=>{
+    claimPopup.style.display = 'none';
+    menu.style.display = 'flex';
+  }, 1200);
+});
+
+closeClaimBtn.addEventListener('click', ()=>{
+  claimPopup.style.display = 'none';
+  menu.style.display = 'flex';
+});
+
+const touchPad = document.getElementById('touchPad');
+
+game.addEventListener('mousemove', e=>{
+  const rect = game.getBoundingClientRect();
+  aimX = e.clientX - rect.left;
+});
+
+touchPad.addEventListener('touchmove', e=>{
+  const rect = game.getBoundingClientRect();
+  aimX = e.touches[0].clientX - rect.left;
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.key === 'ArrowLeft') aimX -= 12;
+  if(e.key === 'ArrowRight') aimX += 12;
+});
+
+muteBtn.addEventListener('click', ()=>{
+  muted = !muted;
+  muteBtn.textContent = muted ? '🔇 Off' : '🔊 On';
+});
+
+document.getElementById('howBtn').addEventListener('click', ()=>{
+  alert('Use ← → keys or drag on mobile to move the goal left/right. Catch falling OFC logos. You have 3 lives. After game over you can claim reward based on Balls/10 (Just for fun).');
+});
+
+startBtn.addEventListener('click', startGame);
+
+(function init(){
+  GOAL_WIDTH = parseFloat(getComputedStyle(goalWrap).width);
+  goalWrap.style.left = (GAME_W/2 - GOAL_WIDTH/2) + 'px';
+  updateHUD();
+})();
+</script>
+
 </body>
 </html>
