@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,13 +10,12 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 .team-title {
-    font-family: 'Luckiest Guy', cursive; /* Hoặc 'Bebas Neue' nếu muốn */
+    font-family: 'Luckiest Guy', cursive;
     font-size: 26px;
     margin-bottom: 20px;
-    color: #fff; /* Tùy chỉnh màu cho nổi bật */
-    text-shadow: 0 0 8px #00ffab; /* Tạo hiệu ứng neon xịn hơn */
+    color: #fff;
+    text-shadow: 0 0 8px #00ffab;
 }
-
 
 :root{
     --neon:#00e676;
@@ -33,10 +33,18 @@ body{
 .site-header{
     display:flex;
     align-items:center;
-    gap:14px;
+    justify-content:space-between;
     padding:16px 24px;
     background:var(--dark);
     border-bottom:4px solid var(--neon);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
 }
 
 .header-logo{
@@ -52,6 +60,37 @@ body{
     font-size:32px;
     text-transform:uppercase;
     color:#fff;
+}
+
+.header-nav {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--neon) 0%, #00ffab 100%);
+    color: var(--dark);
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+}
+
+.nav-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.6);
+    background: linear-gradient(135deg, #00ffab 0%, var(--neon) 100%);
+}
+
+.nav-link:active {
+    transform: translateY(0);
 }
 
 .team-section{
@@ -268,7 +307,6 @@ a{
     text-align:center;
 }
 
-/* Glow animation */
 @keyframes glow{
     0% { box-shadow: 0 0 8px var(--neon); }
     100% { box-shadow: 0 0 18px #00ffab; }
@@ -307,8 +345,37 @@ a{
     margin-bottom: 20px;
 }
 
+/* Responsive */
+@media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .header-left {
+        flex-direction: column;
+    }
+    
+    .header-nav {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .nav-link {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+    
+    .header-title {
+        font-size: 24px;
+    }
+}
+
 </style>
 </head>
+<body>
+
 <div id="musicControl" style="position:fixed;bottom:20px;right:20px;display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.5);padding:8px 12px;border-radius:50px;border:2px solid #00e676;cursor:pointer;z-index:999;">
     <span style="font-size:20px;">⚽️</span>
     <button id="toggleMusic" style="background:none;border:none;color:#00e676;font-size:16px;cursor:pointer;">▶️</button>
@@ -317,7 +384,6 @@ a{
 
 <audio id="bgMusic" loop autoplay>
     <source src="onefootballmusic.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
 </audio>
 
 <script>
@@ -325,10 +391,8 @@ const music = document.getElementById('bgMusic');
 const toggleBtn = document.getElementById('toggleMusic');
 const volumeSlider = document.getElementById('volumeControl');
 
-// Set initial volume
 music.volume = volumeSlider.value;
 
-// Toggle music
 toggleBtn.addEventListener('click', () => {
     if (music.paused) {
         music.play();
@@ -339,20 +403,28 @@ toggleBtn.addEventListener('click', () => {
     }
 });
 
-// Adjust volume
 volumeSlider.addEventListener('input', () => {
     music.volume = volumeSlider.value;
 });
 </script>
-<body>
+
 <header class="site-header">
-    <a href="https://x.com/ofc_the_club" target="_blank">
-        <img class="header-logo" src="https://pbs.twimg.com/profile_images/1805905043914121216/TMn0Dvx__400x400.png">
-    </a>
-    <div>
-        <div class="header-title">OneFootball Club Glory Wall</div>
-        <div style="font-size:12px;opacity:.65">Honoring our top superfans & contributors</div>
+    <div class="header-left">
+        <a href="https://x.com/ofc_the_club" target="_blank">
+            <img class="header-logo" src="https://pbs.twimg.com/profile_images/1805905043914121216/TMn0Dvx__400x400.png">
+        </a>
+        <div>
+            <div class="header-title">OneFootball Club Glory Wall</div>
+            <div style="font-size:12px;opacity:.65">Honoring our top superfans & contributors</div>
+        </div>
     </div>
+    
+    <nav class="header-nav">
+        <a href="game.html" class="nav-link">
+            <span>🎮</span>
+            <span>Play Game</span>
+        </a>
+    </nav>
 </header>
 
 
